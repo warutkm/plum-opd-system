@@ -1,0 +1,54 @@
+# ============================================================================
+# Plum OPD Claim Adjudication System — Python Dependencies
+# ============================================================================
+
+# --- Core Framework ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+websockets==14.2
+
+# --- Database ---
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+supabase==2.11.0
+pgvector==0.3.6
+
+# --- AI / LLM ---
+google-generativeai==0.8.4
+
+# --- Data Validation & Settings ---
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# --- HTTP Client ---
+httpx==0.28.1
+
+# --- File & Document Processing ---
+filetype==1.2.0
+Pillow==11.1.0
+PyPDF2==3.0.1
+
+# --- Vector / Numerical ---
+numpy==2.2.1
+
+# --- Retry / Resilience ---
+tenacity==9.0.0
+
+# --- Serialization ---
+orjson==3.10.12
+
+# --- Logging ---
+structlog==24.4.0
+
+# --- Environment ---
+python-dotenv==1.0.1
+
+# --- Testing ---
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-cov==6.0.0
+
+# --- Linting (dev) ---
+ruff==0.8.6

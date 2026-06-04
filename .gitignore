@@ -1,0 +1,57 @@
+# --- Environment / Secrets ---
+.env
+.env.*
+!.env.example
+jwt_secret.txt
+secrets.json
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Node / Frontend ---
+node_modules/
+.next/
+out/
+build/
+dist/
+.vercel
+.npm
+.yarn-error.log
+yarn.lock
+package-lock.json
+
+# --- Large Files / Databases ---
+*.sqlite
+*.db
+*.sqlite3
+*.zip
+*.tar.gz
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.exe
+*.dll
+
+# --- System / Editors ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

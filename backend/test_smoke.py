@@ -1,0 +1,261 @@
+"""
+Quick smoke test — Run all 10 test cases against the Deterministic Rule Engine.
+Verifies decision, approved amount, and rejection reasons.
+"""
+
+import json
+import sys
+from datetime import date
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from app.models.domain import (
+    AdjudicationContext, ExtractedData, Member, PolicyTerms,
+)
+from app.engine.rule_engine import DeterministicRuleEngine
+
+
+def load_policy() -> PolicyTerms:
+    p = Path(__file__).parent / "reference" / "policy_terms.json"
+    return PolicyTerms(**json.loads(p.read_text()))
+
+
+def run_tests():
+    policy = load_policy()
+    engine = DeterministicRuleEngine(policy)
+    passed = 0
+    failed = 0
+
+    # ── TC001: Simple Consultation — Approved ──────────────────
+    ctx = AdjudicationContext(
+        claim_id="TC001", claim_amount=1500,
+        treatment_date=date(2024, 11, 1),
+        member=Member(member_id="EMP001", name="Rajesh Kumar",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Rajesh Kumar",
+            doctor_name="Dr. Sharma",
+            doctor_registration="KA/45678/2015",
+            diagnosis="Viral fever",
+            medicines=["Paracetamol 650mg", "Vitamin C"],
+            tests=["CBC", "Dengue test"],
+            treatment_date=date(2024, 11, 1),
+        ),
+        bill_items={"consultation_fee": 1000, "diagnostic_tests": 500},
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "APPROVED" and r.approved_amount == 1350
+    print(f"{'✅' if ok else '❌'} TC001  decision={r.decision.value}  amt={r.approved_amount}  (expect APPROVED / 1350)")
+    passed += ok; failed += (not ok)
+
+    # ── TC002: Dental — Partial ────────────────────────────────
+    ctx = AdjudicationContext(
+        claim_id="TC002", claim_amount=12000,
+        treatment_date=date(2024, 10, 15),
+        member=Member(member_id="EMP002", name="Priya Singh",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Priya Singh",
+            doctor_name="Dr. Patel",
+            doctor_registration="MH/23456/2018",
+            diagnosis="Tooth decay requiring root canal",
+            procedures=["Root canal treatment", "Teeth whitening"],
+            treatment_date=date(2024, 10, 15),
+        ),
+        bill_items={"root_canal": 8000, "teeth_whitening": 4000},
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "PARTIAL" and r.approved_amount == 8000
+    print(f"{'✅' if ok else '❌'} TC002  decision={r.decision.value}  amt={r.approved_amount}  (expect PARTIAL / 8000)")
+    passed += ok; failed += (not ok)
+
+    # ── TC003: Limit Exceeded — Rejected ───────────────────────
+    ctx = AdjudicationContext(
+        claim_id="TC003", claim_amount=7500,
+        treatment_date=date(2024, 10, 20),
+        member=Member(member_id="EMP003", name="Amit Verma",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Amit Verma",
+            doctor_name="Dr. Gupta",
+            doctor_registration="DL/34567/2016",
+            diagnosis="Gastroenteritis",
+            medicines=["Antibiotics", "Probiotics"],
+            treatment_date=date(2024, 10, 20),
+        ),
+        bill_items={"consultation_fee": 2000, "medicines": 5500},
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "REJECTED" and "PER_CLAIM_EXCEEDED" in r.rejection_reasons
+    print(f"{'✅' if ok else '❌'} TC003  decision={r.decision.value}  reasons={r.rejection_reasons}  (expect REJECTED / PER_CLAIM_EXCEEDED)")
+    passed += ok; failed += (not ok)
+
+    # ── TC004: Missing Documents — Rejected ────────────────────
+    ctx = AdjudicationContext(
+        claim_id="TC004", claim_amount=2000,
+        treatment_date=date(2024, 10, 25),
+        member=Member(member_id="EMP004", name="Sneha Reddy",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["bill"],  # NO prescription
+        extracted_data=ExtractedData(
+            patient_name="Sneha Reddy",
+            treatment_date=date(2024, 10, 25),
+        ),
+        bill_items={"consultation_fee": 1500, "medicines": 500},
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "REJECTED" and "MISSING_DOCUMENTS" in r.rejection_reasons
+    print(f"{'✅' if ok else '❌'} TC004  decision={r.decision.value}  reasons={r.rejection_reasons}  (expect REJECTED / MISSING_DOCUMENTS)")
+    passed += ok; failed += (not ok)
+
+    # ── TC005: Waiting Period — Rejected ───────────────────────
+    ctx = AdjudicationContext(
+        claim_id="TC005", claim_amount=3000,
+        treatment_date=date(2024, 10, 15),
+        member=Member(member_id="EMP005", name="Vikram Joshi",
+                       join_date=date(2024, 9, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Vikram Joshi",
+            doctor_name="Dr. Mehta",
+            doctor_registration="GJ/56789/2014",
+            diagnosis="Type 2 Diabetes",
+            medicines=["Metformin", "Glimepiride"],
+            treatment_date=date(2024, 10, 15),
+        ),
+        bill_items={"consultation_fee": 1000, "medicines": 2000},
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "REJECTED" and "WAITING_PERIOD" in r.rejection_reasons
+    print(f"{'✅' if ok else '❌'} TC005  decision={r.decision.value}  reasons={r.rejection_reasons}  (expect REJECTED / WAITING_PERIOD)")
+    passed += ok; failed += (not ok)
+
+    # ── TC006: Alternative Medicine — Approved ─────────────────
+    ctx = AdjudicationContext(
+        claim_id="TC006", claim_amount=4000,
+        treatment_date=date(2024, 10, 28),
+        member=Member(member_id="EMP006", name="Kavita Nair",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Kavita Nair",
+            doctor_name="Vaidya Krishnan",
+            doctor_registration="AYUR/KL/2345/2019",
+            diagnosis="Chronic joint pain",
+            procedures=["Panchakarma therapy"],
+            treatment_date=date(2024, 10, 28),
+        ),
+        bill_items={"consultation_fee": 1000, "therapy_charges": 3000},
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "APPROVED" and r.approved_amount == 4000
+    print(f"{'✅' if ok else '❌'} TC006  decision={r.decision.value}  amt={r.approved_amount}  (expect APPROVED / 4000)")
+    passed += ok; failed += (not ok)
+
+    # ── TC007: Pre-Auth Required — Rejected ────────────────────
+    ctx = AdjudicationContext(
+        claim_id="TC007", claim_amount=15000,
+        treatment_date=date(2024, 11, 2),
+        member=Member(member_id="EMP007", name="Suresh Patil",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Suresh Patil",
+            doctor_name="Dr. Rao",
+            doctor_registration="AP/67890/2017",
+            diagnosis="Suspected lumbar disc herniation",
+            tests=["MRI Lumbar Spine"],
+            treatment_date=date(2024, 11, 2),
+        ),
+        bill_items={"mri_scan": 15000},
+        has_pre_authorization=False,
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "REJECTED" and "PRE_AUTH_MISSING" in r.rejection_reasons
+    print(f"{'✅' if ok else '❌'} TC007  decision={r.decision.value}  reasons={r.rejection_reasons}  (expect REJECTED / PRE_AUTH_MISSING)")
+    passed += ok; failed += (not ok)
+
+    # ── TC008: Fraud Detection — (Rule engine passes; fraud engine handles)
+    ctx = AdjudicationContext(
+        claim_id="TC008", claim_amount=4800,
+        treatment_date=date(2024, 10, 30),
+        member=Member(member_id="EMP008", name="Ravi Menon",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Ravi Menon",
+            doctor_name="Dr. Khan",
+            doctor_registration="UP/45678/2016",
+            diagnosis="Migraine",
+            medicines=["Sumatriptan", "Propranolol"],
+            treatment_date=date(2024, 10, 30),
+        ),
+        bill_items={"consultation_fee": 2000, "medicines": 2800},
+        previous_claims_count_24h=3,
+    )
+    r = engine.adjudicate(ctx)
+    # TC008 passes the rule engine (fraud is handled later in the pipeline)
+    ok = r.decision.value == "APPROVED"
+    print(f"{'✅' if ok else '❌'} TC008  decision={r.decision.value}  amt={r.approved_amount}  (expect APPROVED from rules — fraud engine flags later)")
+    passed += ok; failed += (not ok)
+
+    # ── TC009: Excluded Treatment — Rejected ───────────────────
+    ctx = AdjudicationContext(
+        claim_id="TC009", claim_amount=8000,
+        treatment_date=date(2024, 10, 18),
+        member=Member(member_id="EMP009", name="Anita Desai",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Anita Desai",
+            doctor_name="Dr. Banerjee",
+            doctor_registration="WB/34567/2015",
+            diagnosis="Obesity - BMI 35",
+            procedures=["Bariatric consultation and diet plan"],
+            treatment_date=date(2024, 10, 18),
+        ),
+        bill_items={"consultation_fee": 3000, "diet_plan": 5000},
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "REJECTED" and "SERVICE_NOT_COVERED" in r.rejection_reasons
+    print(f"{'✅' if ok else '❌'} TC009  decision={r.decision.value}  reasons={r.rejection_reasons}  (expect REJECTED / SERVICE_NOT_COVERED)")
+    passed += ok; failed += (not ok)
+
+    # ── TC010: Network Hospital — Approved with discount ───────
+    ctx = AdjudicationContext(
+        claim_id="TC010", claim_amount=4500,
+        treatment_date=date(2024, 11, 3),
+        member=Member(member_id="EMP010", name="Deepak Shah",
+                       join_date=date(2024, 1, 1), policy_id=policy.policy_id),
+        documents_submitted=["prescription", "bill"],
+        extracted_data=ExtractedData(
+            patient_name="Deepak Shah",
+            doctor_name="Dr. Iyer",
+            doctor_registration="TN/56789/2013",
+            diagnosis="Acute bronchitis",
+            medicines=["Antibiotics", "Bronchodilators"],
+            treatment_date=date(2024, 11, 3),
+        ),
+        bill_items={"consultation_fee": 1500, "medicines": 3000},
+        hospital_name="Apollo Hospitals",
+        is_cashless=True,
+    )
+    r = engine.adjudicate(ctx)
+    ok = r.decision.value == "APPROVED" and r.approved_amount == 3600 and r.is_cashless_approved
+    print(f"{'✅' if ok else '❌'} TC010  decision={r.decision.value}  amt={r.approved_amount}  cashless={r.is_cashless_approved}  (expect APPROVED / 3600 / cashless)")
+    passed += ok; failed += (not ok)
+
+    # ── Summary ─────────────────────────────────────────────────
+    print(f"\n{'='*60}")
+    print(f"  Results:  {passed} passed  /  {failed} failed  /  {passed+failed} total")
+    print(f"{'='*60}")
+    return failed == 0
+
+
+if __name__ == "__main__":
+    success = run_tests()
+    sys.exit(0 if success else 1)
