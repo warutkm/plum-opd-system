@@ -6,23 +6,33 @@ This guide describes how to run automated unit, integration, and regression eval
 
 ## 1. Automated Test Suite (Pytest)
 
-The project includes 84 automated unit and integration tests located in the `backend/tests/` directory. These tests evaluate the rule engine, RAG system, fraud engine, and confidence score calculators.
+The project includes 108 automated unit and integration tests located in the `backend/tests/` directory. These tests evaluate the uploader gateway, document verifier, AI extraction, normalization, validations, rule engine, RAG system, fraud engine, report generator, and confidence score calculators.
 
 ### Running Pytest:
 Navigate to the `backend/` directory and execute:
 ```powershell
-python -m pytest tests/
+python -m pytest tests/ -v
 ```
 
 ### Test Coverage Areas:
-- `test_eligibility.py`: Verifies waiting periods, active policy checks, and age validations.
+- `test_adjudication.py`: Verifies end-to-end adjudication endpoints and upload flows.
+- `test_api.py`: Tests API health check, list claims, and adjuster review queue endpoints.
+- `test_cases_integration.py`: Runs all 10 reference test cases as API integration assertions.
+- `test_confidence.py`: Verifies the 40/40/20 weighted confidence score formulas and overrides.
 - `test_coverage.py`: Verifies covered and excluded medical treatments.
+- `test_decision.py`: Tests composite decision and confidence score aggregation.
+- `test_eligibility.py`: Verifies waiting periods, active policy checks, and age validations.
+- `test_extraction_agent.py`: Verifies AI Multimodal extraction parsing and fallbacks.
 - `test_financial.py`: Tests co-pays, network discounts, limits, and pre-auth exclusions.
 - `test_fraud_engine.py`: Verifies Rule-Based transaction checks.
-- `test_vector_fraud.py`: Verifies claim profile generation and vector search mock bounds.
-- `test_confidence.py`: Verifies the 40/40/20 weighted confidence score formulas.
-- `test_trace_ledger.py`: Ensures chronological tracing and lifespan early-exiting.
+- `test_gateway_agent.py`: Tests file size and MIME-type gateway validations.
+- `test_medical_necessity.py`: Verifies AI Medical Necessity evaluation and fallbacks.
+- `test_normalization.py`: Validates dates, doctor registration numbers, and currency amount normalization.
+- `test_partial_approval.py`: Verifies line item parsing and sub-limit split checks.
+- `test_pipeline.py`: Tests direct Python rule engine and service pipeline execution.
+- `test_rag.py`: Verifies Document chunker, retriever database seeding, and AI answer generator.
 - `test_report.py`: Tests the structured 6-section Investigator Report.
+- `test_trace_ledger.py`: Ensures chronological tracing and lifespan early-exiting.
 
 ---
 
