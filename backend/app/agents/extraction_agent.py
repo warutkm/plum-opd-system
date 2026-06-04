@@ -253,6 +253,7 @@ GUIDELINES:
    - 0.80-0.94 = most fields clear, some uncertain
    - 0.60-0.79 = significant uncertainty in multiple fields
    - Below 0.60 = poor quality, many fields uncertain or missing
+10. CONSOLIDATION: If multiple files or documents are provided, combine and consolidate all the extracted details into a single flat JSON object matching the requested schema. Do NOT return a list of JSON objects.
 
 {_FEW_SHOT_EXAMPLES}
 
@@ -264,6 +265,74 @@ Return ONLY a valid JSON object matching the requested schema. No additional tex
         try:
             response_text = self._call_gemini(contents)
             data = json.loads(response_text)
+
+            # Consolidate list response to dictionary if returned (e.g. from multiple files)
+            if isinstance(data, list):
+                logger.info("Gemini returned a list of extractions. Consolidating...")
+                consolidated = {
+                    "patient_name": None,
+                    "bill_number": None,
+                    "age": None,
+                    "doctor_name": None,
+                    "doctor_registration": None,
+                    "diagnosis": None,
+                    "medicines": [],
+                    "procedures": [],
+                    "tests": [],
+                    "provider_name": None,
+                    "bill_amount": 0.0,
+                    "treatment_date": None,
+                    "bill_items": {},
+                    "extraction_confidence": 0.0
+                }
+                confidences = []
+                for item in data:
+                    if not isinstance(item, dict):
+                        continue
+                    
+                    # Merge strings/scalars
+                    for field in ["patient_name", "bill_number", "age", "doctor_name", "doctor_registration", "diagnosis", "provider_name", "treatment_date"]:
+                        val = item.get(field)
+                        if val and not consolidated[field]:
+                            consolidated[field] = str(val)
+                    
+                    # Merge lists
+                    for field in ["medicines", "procedures", "tests"]:
+                        vals = item.get(field)
+                        if isinstance(vals, list):
+                            for v in vals:
+                                if v and str(v) not in consolidated[field]:
+                                    consolidated[field].append(str(v))
+                    
+                    # Merge bill items and amount
+                    amount = item.get("bill_amount")
+                    if amount:
+                        try:
+                            consolidated["bill_amount"] += float(amount)
+                        except (ValueError, TypeError):
+                            pass
+                    
+                    items = item.get("bill_items")
+                    if isinstance(items, dict):
+                        for k, v in items.items():
+                            try:
+                                consolidated["bill_items"][k] = float(v)
+                            except (ValueError, TypeError):
+                                consolidated["bill_items"][k] = v
+                                
+                    conf = item.get("extraction_confidence")
+                    if conf is not None:
+                        try:
+                            confidences.append(float(conf))
+                        except (ValueError, TypeError):
+                            pass
+                
+                if confidences:
+                    consolidated["extraction_confidence"] = sum(confidences) / len(confidences)
+                else:
+                    consolidated["extraction_confidence"] = 0.85
+                
+                data = consolidated
 
             # Parse treatment date
             treatment_date = None
