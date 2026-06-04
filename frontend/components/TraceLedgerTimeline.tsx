@@ -28,20 +28,20 @@ export default function TraceLedgerTimeline({ traces }: { traces: TraceEntry[] }
   }
 
   return (
-    <div className="relative space-y-5 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-white/10">
+    <div className="relative border-l border-white/10 ml-4 pl-8 space-y-6">
       {traces.map((trace, index) => {
         const config = statusConfig[trace.status] || statusConfig.PENDING;
         const Icon = config.icon;
         
         return (
-          <div key={index} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group animate-slide-in">
-            {/* Icon */}
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full border ${config.bg} ${config.border} ${config.color} shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-lg shadow-black/40 z-10 bg-slate-950`}>
-              <Icon className="w-4 h-4" />
+          <div key={index} className="relative group animate-slide-in">
+            {/* Icon (exactly centered on the parent left border) */}
+            <div className={`absolute -left-12 top-4 flex items-center justify-center w-8 h-8 rounded-full border ${config.bg} ${config.border} ${config.color} shrink-0 shadow-lg shadow-black/40 z-10 bg-slate-950`}>
+              <Icon className="w-3.5 h-3.5" />
             </div>
             
             {/* Card */}
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl border border-white/5 bg-slate-900/40 backdrop-blur-md shadow-lg hover:border-white/15 transition-all">
+            <div className="w-full p-5 rounded-2xl border border-white/5 bg-slate-900/40 backdrop-blur-md shadow-lg hover:border-white/15 transition-all">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-bold text-white text-xs tracking-wider">{formatStepName(trace.step)}</h4>
                 <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded border ${config.bg} ${config.color} ${config.border} tracking-wide`}>
@@ -54,7 +54,7 @@ export default function TraceLedgerTimeline({ traces }: { traces: TraceEntry[] }
                   {Object.entries(trace.details).map(([key, val]) => (
                     <div key={key} className="flex flex-col sm:flex-row sm:gap-2.5 mb-1.5 last:mb-0">
                       <span className="font-bold text-blue-400 shrink-0">{key}:</span>
-                      <span className="truncate">{typeof val === 'object' ? JSON.stringify(val) : String(val)}</span>
+                      <span className="break-words whitespace-pre-wrap">{typeof val === 'object' ? JSON.stringify(val) : String(val)}</span>
                     </div>
                   ))}
                 </div>
