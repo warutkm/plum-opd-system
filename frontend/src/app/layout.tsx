@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { FileText, LayoutDashboard, Sparkles } from 'lucide-react';
+import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
