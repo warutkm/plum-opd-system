@@ -79,6 +79,7 @@ from app.services.claim_service import ClaimService
 CORS_ORIGINS: List[str] = [
     "http://localhost:3000",         # Next.js dev server
     "http://127.0.0.1:3000",
+    "https://plum-opd-system.vercel.app", # Vercel production deployment
     os.getenv("FRONTEND_URL", ""),   # Production frontend
 ]
 # Remove empty strings
