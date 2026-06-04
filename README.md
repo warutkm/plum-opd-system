@@ -749,17 +749,19 @@ pytest tests/test_cases_integration.py -v
 
 ### Frontend → Vercel
 
-```bash
-cd frontend
-vercel --prod
-```
+1. Import your GitHub repository into [Vercel](https://vercel.com/).
+2. Set the **Root Directory** to `frontend`.
+3. Configure the environment variable:
+   - `NEXT_PUBLIC_API_URL`: Your deployed Render backend URL (`https://<your-service>.onrender.com/api/v1`).
+4. Click **Deploy**.
 
-### Backend → Railway
+### Backend → Render
 
-```bash
-cd backend
-railway up
-```
+1. Create a new **Web Service** on [Render](https://render.com/).
+2. Connect your GitHub repository.
+3. Choose the **Docker** runtime.
+4. Set up environment variables (`DATABASE_URL`, `GEMINI_API_KEY`, `JWT_SECRET`).
+5. Click **Deploy Web Service**.
 
 ### Database → Supabase
 
