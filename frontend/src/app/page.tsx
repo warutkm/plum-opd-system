@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Upload, FileText, CheckCircle2, AlertCircle, ChevronRight, Activity } from 'lucide-react';
+import { Upload, FileText, CheckCircle2, AlertCircle, ChevronRight, Activity, Calendar, ShieldCheck, Landmark, User, Info } from 'lucide-react';
 import { api } from '../../lib/api';
 
 export default function Home() {
@@ -71,31 +71,35 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center py-12 px-4">
-      {/* Header */}
-      <div className="text-center max-w-2xl mb-10 mt-6">
-        <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-full bg-slate-200 text-slate-800 text-xs font-semibold">
-          <Activity className="w-3.5 h-3.5 mr-1.5 text-blue-600" />
-          OPD Claims Adjudication Copilot
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center py-12 px-4 md:px-8">
+      {/* Header Badge & Title */}
+      <div className="text-center max-w-2xl mb-12 animate-fade-in">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold shadow-sm">
+          <Activity className="w-3.5 h-3.5 text-blue-400 animate-pulse-glow" />
+          <span>AI-Augmented Adjudication Engine</span>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-3">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-400">
           Submit OPD Claim
         </h1>
-        <p className="text-sm text-slate-600">
-          Fill in the claim metadata and upload your invoice or prescription. The adjudication engine will parse documents and run rule checks instantly.
+        <p className="text-sm md:text-base text-slate-400 max-w-lg mx-auto leading-relaxed">
+          Provide claim details and upload medical documents. The multi-agent copilot runs checks and determines payouts in real time.
         </p>
       </div>
 
-      {/* Main Container */}
-      <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-2">
+      {/* Main Glass Panel */}
+      <div className="w-full max-w-4xl glass-card rounded-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 shadow-2xl border border-white/5 glow-blue animate-slide-in">
         {/* Left Column: Form Details */}
-        <div className="p-8 border-b md:border-b-0 md:border-r border-slate-200 space-y-5">
-          <h2 className="text-lg font-bold text-slate-900 border-b pb-2">Claim Metadata</h2>
+        <div className="p-8 border-b md:border-b-0 md:border-r border-white/5 space-y-6">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <h2 className="text-lg font-bold text-white tracking-wide">Claim Details</h2>
+            <Info className="w-4 h-4 text-slate-500" />
+          </div>
           
           <div className="space-y-4">
             {/* Member ID */}
             <div>
-              <label htmlFor="memberId" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
+              <label htmlFor="memberId" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-slate-400" />
                 Member Employee ID
               </label>
               <input
@@ -103,7 +107,7 @@ export default function Home() {
                 type="text"
                 value={memberId}
                 onChange={(e) => setMemberId(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4.5 py-3 border border-white/10 rounded-xl bg-slate-900/60 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 placeholder-slate-600 transition-all"
                 placeholder="e.g. EMP001"
                 required
               />
@@ -111,15 +115,16 @@ export default function Home() {
 
             {/* Claim Amount */}
             <div>
-              <label htmlFor="claimAmount" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Total Claimed Amount (₹)
+              <label htmlFor="claimAmount" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                <span>₹</span>
+                Total Claimed Amount (INR)
               </label>
               <input
                 id="claimAmount"
                 type="number"
                 value={claimAmount}
                 onChange={(e) => setClaimAmount(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4.5 py-3 border border-white/10 rounded-xl bg-slate-900/60 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 placeholder-slate-600 transition-all"
                 placeholder="e.g. 1500"
                 min="0"
                 required
@@ -128,7 +133,8 @@ export default function Home() {
 
             {/* Treatment Date */}
             <div>
-              <label htmlFor="treatmentDate" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
+              <label htmlFor="treatmentDate" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
                 Treatment / Visit Date
               </label>
               <input
@@ -136,52 +142,58 @@ export default function Home() {
                 type="date"
                 value={treatmentDate}
                 onChange={(e) => setTreatmentDate(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4.5 py-3 border border-white/10 rounded-xl bg-slate-900/60 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                 required
               />
             </div>
 
             {/* Hospital Name */}
             <div>
-              <label htmlFor="hospitalName" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Hospital / Provider Name
+              <label htmlFor="hospitalName" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                <Landmark className="w-3.5 h-3.5 text-slate-400" />
+                Hospital / Clinic Name
               </label>
               <input
                 id="hospitalName"
                 type="text"
                 value={hospitalName}
                 onChange={(e) => setHospitalName(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4.5 py-3 border border-white/10 rounded-xl bg-slate-900/60 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 placeholder-slate-600 transition-all"
                 placeholder="e.g. Apollo Hospitals"
               />
             </div>
 
             {/* Cashless Checkbox */}
-            <div className="flex items-center gap-2 pt-2">
-              <input
-                id="isCashless"
-                type="checkbox"
-                checked={isCashless}
-                onChange={(e) => setIsCashless(e.target.checked)}
-                className="w-4 h-4 border border-slate-300 rounded accent-blue-600 cursor-pointer"
-              />
-              <label htmlFor="isCashless" className="text-sm font-medium text-slate-700 cursor-pointer">
-                Request cashless settlement (network hospital only)
+            <div className="flex items-center gap-3 pt-3">
+              <div className="relative flex items-center">
+                <input
+                  id="isCashless"
+                  type="checkbox"
+                  checked={isCashless}
+                  onChange={(e) => setIsCashless(e.target.checked)}
+                  className="w-5 h-5 border border-white/20 rounded-md bg-slate-900/60 accent-blue-600 cursor-pointer focus:ring-0 focus:ring-offset-0"
+                />
+              </div>
+              <label htmlFor="isCashless" className="text-sm font-semibold text-slate-300 cursor-pointer select-none">
+                Request cashless settlement <span className="text-xs text-slate-500 font-normal">(network hospital only)</span>
               </label>
             </div>
           </div>
         </div>
 
         {/* Right Column: File Drag & Drop */}
-        <div className="p-8 flex flex-col justify-between bg-slate-50/50">
-          <div className="space-y-5">
-            <h2 className="text-lg font-bold text-slate-900 border-b pb-2">Medical Documents</h2>
+        <div className="p-8 flex flex-col justify-between bg-slate-950/20">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+              <h2 className="text-lg font-bold text-white tracking-wide">Upload Invoice/Prescription</h2>
+              <FileText className="w-4 h-4 text-slate-500" />
+            </div>
             
             {/* Drag and Drop box */}
             <div 
-              className={`relative rounded-xl border-2 border-dashed p-8 transition-all text-center flex flex-col items-center justify-center min-h-[200px]
-                ${dragActive ? 'border-blue-500 bg-blue-50/50' : 'border-slate-300 bg-white hover:border-slate-400'}
-                ${file ? 'border-green-500/50 bg-green-50/30' : ''}`}
+              className={`relative rounded-2xl border-2 border-dashed p-8 transition-all duration-350 text-center flex flex-col items-center justify-center min-h-[220px] group
+                ${dragActive ? 'border-blue-500 bg-blue-500/10' : 'border-white/10 bg-slate-900/30 hover:border-white/20 hover:bg-slate-900/50'}
+                ${file ? 'border-green-500/40 bg-green-500/5 glow-green' : ''}`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -189,28 +201,28 @@ export default function Home() {
             >
               <input
                 type="file"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 onChange={handleChange}
                 accept=".pdf,.png,.jpg,.jpeg"
                 disabled={isSubmitting}
               />
               
-              <div className="flex flex-col items-center justify-center gap-3">
+              <div className="flex flex-col items-center justify-center gap-4">
                 {file ? (
-                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 mb-1 border border-green-200">
-                    <CheckCircle2 className="w-6 h-6" />
+                  <div className="w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 border border-green-500/20 shadow-lg shadow-green-500/5">
+                    <CheckCircle2 className="w-6 h-6 animate-pulse-glow" />
                   </div>
                 ) : (
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center mb-1 bg-slate-100 text-slate-400 border border-slate-200">
+                  <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-slate-400 border border-white/10 group-hover:text-blue-400 group-hover:border-blue-500/30 group-hover:bg-blue-500/5 transition-all">
                     <Upload className="w-6 h-6" />
                   </div>
                 )}
                 
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">
+                  <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">
                     {file ? file.name : 'Select or drag document here'}
                   </p>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-slate-500 mt-1.5">
                     {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : 'Supports PDF, JPG, PNG up to 10MB'}
                   </p>
                 </div>
@@ -218,8 +230,9 @@ export default function Home() {
             </div>
 
             {error && (
-              <div className="p-3.5 rounded-lg bg-red-50 text-red-700 text-xs border border-red-200 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-red-500" /> {error}
+              <div className="p-4 rounded-xl bg-red-500/10 text-red-400 text-xs border border-red-500/20 flex items-start gap-2.5 shadow-sm shadow-red-500/5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+                <span className="leading-relaxed font-semibold">{error}</span>
               </div>
             )}
           </div>
@@ -227,35 +240,45 @@ export default function Home() {
           <button
             onClick={onSubmit}
             disabled={!file || isSubmitting}
-            className="w-full mt-6 py-3.5 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2
+            className="w-full mt-8 py-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2.5 shadow-lg
               disabled:opacity-50 disabled:cursor-not-allowed
-              bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+              bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/10 hover:shadow-blue-500/20"
           >
             {isSubmitting ? (
-              <span className="flex items-center gap-2">
-                <Activity className="w-4 h-4 animate-spin" /> Adjudicating Claim...
+              <span className="flex items-center gap-2.5">
+                <Activity className="w-4 h-4 animate-spin text-white" /> Adjudicating claim via AI multi-agents...
               </span>
             ) : (
-              <>Submit for Adjudication <ChevronRight className="w-4 h-4" /></>
+              <>
+                <span>Submit for Adjudication</span>
+                <ChevronRight className="w-4.5 h-4.5" />
+              </>
             )}
           </button>
         </div>
       </div>
       
       {/* Policy Helper Quick References */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 max-w-4xl w-full">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-14 max-w-4xl w-full">
         {[
-          { title: "Consultation limit", desc: "Capped at ₹1500 with a standard 10% co-pay." },
-          { title: "Cashless discount", desc: "20% network discount applied automatically on cashless network hospital visits." },
-          { title: "Excluded items", desc: "Cosmetic procedures, dental whitening, and weight loss are strictly excluded." },
-        ].map((feat, i) => (
-          <div key={i} className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between">
-            <h3 className="font-semibold text-slate-800 text-sm mb-1">{feat.title}</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">{feat.desc}</p>
-          </div>
-        ))}
+          { title: "Consultation Limits", desc: "Consultation fee capped at ₹1500 per visit, with a standard 10% co-pay applied dynamically.", icon: ShieldCheck },
+          { title: "Cashless Discounts", desc: "Enjoy a 20% network discount applied automatically on cashless network hospital visits.", icon: Landmark },
+          { title: "Exclusion Screenings", desc: "Cosmetic procedures, dental whitening, and weight loss remedies are automatically flagged and rejected.", icon: Info },
+        ].map((feat, i) => {
+          const Icon = feat.icon;
+          return (
+            <div key={i} className="p-5 rounded-2xl border border-white/5 bg-slate-900/30 backdrop-blur-md flex flex-col justify-between hover:border-white/10 hover:bg-slate-900/50 transition-all duration-300">
+              <div>
+                <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-3">
+                  <Icon className="w-4 h-4 text-blue-400" />
+                </div>
+                <h3 className="font-bold text-white text-sm mb-1.5">{feat.title}</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">{feat.desc}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
-

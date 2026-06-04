@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { api, ClaimDecisionOutput, InvestigatorReportData, TraceEntry } from '../../../../lib/api';
 import TraceLedgerTimeline from '../../../../components/TraceLedgerTimeline';
 import InvestigatorReport from '../../../../components/InvestigatorReport';
-import { Activity, CheckCircle2, XCircle, AlertTriangle, ArrowLeft, Send, ShieldAlert, BadgeCheck, FileText } from 'lucide-react';
+import { Activity, CheckCircle2, XCircle, AlertTriangle, ArrowLeft, Send, ShieldAlert, BadgeCheck, FileText, User, ChevronRight } from 'lucide-react';
 
 const PIPELINE_STEPS = [
   { id: 'upload', label: 'Gateway Check & Upload', desc: 'Validates file type, size, and initializes Claim ID' },
@@ -139,35 +139,35 @@ export default function ClaimResultPage() {
   // Rendering simulated loading state
   if (loading) {
     return (
-      <div className="min-h-[85vh] max-w-2xl mx-auto px-4 py-12 flex flex-col justify-center">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto mb-4">
-            <Activity className="w-6 h-6 text-blue-600 animate-spin" />
+      <div className="min-h-[85vh] max-w-2xl mx-auto px-4 py-16 flex flex-col justify-center animate-fade-in">
+        <div className="text-center mb-10">
+          <div className="w-14 h-14 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto mb-4 glow-blue">
+            <Activity className="w-6 h-6 text-blue-400 animate-spin" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-800">Processing Claim Pipeline</h2>
-          <p className="text-slate-500 text-sm mt-1">Executing AI agents and rule engine in sequence...</p>
+          <h2 className="text-2xl font-bold text-white tracking-wide">Processing Claim Pipeline</h2>
+          <p className="text-slate-400 text-sm mt-1.5 leading-relaxed">Executing AI extraction agents and deterministic rule engines...</p>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
+        <div className="glass-card border border-white/5 rounded-2xl p-8 space-y-5 glow-blue shadow-2xl">
           {PIPELINE_STEPS.map((step, idx) => {
             const isCompleted = simStep > idx;
             const isActive = simStep === idx;
             return (
-              <div key={step.id} className={`flex items-start gap-3 transition-opacity duration-300 ${isCompleted ? 'opacity-100' : isActive ? 'opacity-100' : 'opacity-40'}`}>
+              <div key={step.id} className={`flex items-start gap-4 transition-all duration-300 ${isCompleted ? 'opacity-100' : isActive ? 'opacity-100 scale-[1.01]' : 'opacity-25'}`}>
                 <div className="mt-0.5 shrink-0">
                   {isCompleted ? (
-                    <div className="w-5 h-5 rounded-full bg-green-100 border border-green-300 text-green-700 flex items-center justify-center font-bold text-xs">✓</div>
+                    <div className="w-5 h-5 rounded-full bg-green-500/20 border border-green-500/35 text-green-400 flex items-center justify-center font-bold text-xs">✓</div>
                   ) : isActive ? (
-                    <div className="w-5 h-5 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-blue-600 animate-ping" />
+                    <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-500/35 flex items-center justify-center">
+                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse-glow" />
                     </div>
                   ) : (
-                    <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200" />
+                    <div className="w-5 h-5 rounded-full bg-slate-900/80 border border-white/10" />
                   )}
                 </div>
                 <div>
-                  <h4 className={`text-sm font-semibold ${isActive ? 'text-blue-600 font-bold' : 'text-slate-800'}`}>{step.label}</h4>
-                  <p className="text-xs text-slate-500">{step.desc}</p>
+                  <h4 className={`text-sm font-bold tracking-wide ${isActive ? 'text-blue-400' : 'text-slate-200'}`}>{step.label}</h4>
+                  <p className="text-xs text-slate-450 mt-0.5 leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             );
@@ -180,23 +180,23 @@ export default function ClaimResultPage() {
   if (error || !decision) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">
-        <XCircle className="w-12 h-12 text-red-600 mb-4" />
-        <h2 className="text-xl font-bold text-slate-800">Error Loading Claim</h2>
-        <p className="text-slate-500 mt-1">{error || 'Claim details could not be retrieved'}</p>
-        <button onClick={() => router.push('/')} className="mt-6 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-sm font-medium transition-colors">
+        <XCircle className="w-14 h-14 text-red-500 mb-4" />
+        <h2 className="text-xl font-bold text-white">Error Loading Claim</h2>
+        <p className="text-slate-400 text-sm mt-1">{error || 'Claim details could not be retrieved'}</p>
+        <button onClick={() => router.push('/')} className="mt-6 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors border border-white/5">
           Go Back
         </button>
       </div>
     );
   }
 
-  // Decision badges configurations
+  // Decision badges configurations (customized for beautiful dark mode glows)
   const statusConfig = {
-    APPROVED: { icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200', text: 'Approved' },
-    REJECTED: { icon: XCircle, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200', text: 'Rejected' },
-    PARTIAL: { icon: AlertTriangle, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', text: 'Partially Approved' },
-    MANUAL_REVIEW: { icon: ShieldAlert, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', text: 'Requires Manual Review' },
-    PENDING: { icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', text: 'Pending' },
+    APPROVED: { icon: CheckCircle2, color: 'text-green-450', bg: 'bg-green-500/5 glow-green', border: 'border-green-500/25', text: 'Approved' },
+    REJECTED: { icon: XCircle, color: 'text-red-450', bg: 'bg-red-500/5 glow-red', border: 'border-red-500/25', text: 'Rejected' },
+    PARTIAL: { icon: AlertTriangle, color: 'text-amber-450', bg: 'bg-amber-500/5 glow-amber', border: 'border-amber-500/25', text: 'Partially Approved' },
+    MANUAL_REVIEW: { icon: ShieldAlert, color: 'text-amber-450', bg: 'bg-amber-500/5 glow-amber', border: 'border-amber-500/25', text: 'Requires Manual Review' },
+    PENDING: { icon: Activity, color: 'text-blue-450', bg: 'bg-blue-500/5 glow-blue', border: 'border-blue-500/25', text: 'Pending' },
   };
 
   // Standardize decision string for matching
@@ -205,39 +205,39 @@ export default function ClaimResultPage() {
   const StatusIcon = currentStatus.icon;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 md:px-8 py-10 animate-fade-in">
       <button 
         onClick={() => router.push('/')}
-        className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors mb-6"
+        className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors mb-6 group"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Upload
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Back to Upload
       </button>
 
       {/* Hero Header Card */}
-      <div className={`p-8 rounded-xl border ${currentStatus.bg} ${currentStatus.border} mb-8 flex flex-col md:flex-row items-center justify-between gap-6`}>
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center border shadow-sm shrink-0">
+      <div className={`p-8 rounded-2xl border ${currentStatus.bg} ${currentStatus.border} mb-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl`}>
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-full bg-slate-950/80 flex items-center justify-center border border-white/5 shadow-inner shrink-0">
             <StatusIcon className={`w-7 h-7 ${currentStatus.color}`} />
           </div>
           <div>
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
               Claim ID: {decision.claim_id}
             </div>
-            <h1 className={`text-2xl md:text-3xl font-bold tracking-tight ${currentStatus.color}`}>
+            <h1 className={`text-2xl md:text-3xl font-extrabold tracking-wide ${currentStatus.color}`}>
               {currentStatus.text}
             </h1>
           </div>
         </div>
         
-        <div className="flex gap-8 bg-white p-4 rounded-lg border border-slate-200 shadow-sm shrink-0">
+        <div className="flex gap-8 bg-slate-950/40 p-4 px-6 rounded-xl border border-white/5 shadow-inner shrink-0 w-full md:w-auto justify-around">
           <div>
-            <div className="text-xs font-medium text-slate-500 mb-1">Confidence Score</div>
-            <div className="text-2xl font-bold text-slate-800">{(decision.confidence_score * 100).toFixed(0)}%</div>
+            <div className="text-xs font-bold text-slate-400 mb-1">Confidence Score</div>
+            <div className="text-2xl font-extrabold text-white">{(decision.confidence_score * 100).toFixed(0)}%</div>
           </div>
-          <div className="border-r border-slate-200 my-1" />
+          <div className="border-r border-white/5 my-1.5" />
           <div>
-            <div className="text-xs font-medium text-slate-500 mb-1">Fraud Score</div>
-            <div className={`text-2xl font-bold ${decision.fraud_score >= 40 ? 'text-red-600' : 'text-slate-800'}`}>
+            <div className="text-xs font-bold text-slate-400 mb-1">Fraud Score</div>
+            <div className={`text-2xl font-extrabold ${decision.fraud_score >= 40 ? 'text-red-400' : 'text-white'}`}>
               {decision.fraud_score.toFixed(0)}/100
             </div>
           </div>
@@ -246,65 +246,65 @@ export default function ClaimResultPage() {
 
       {/* Manual Review Adjuster Action Panel */}
       {decisionStatus === 'MANUAL_REVIEW' && (
-        <div className="bg-amber-50/50 border border-amber-200 rounded-xl p-6 mb-8 shadow-sm">
-          <h3 className="font-bold text-base text-amber-800 mb-2 flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-amber-600" />
-            Adjuster Review Panel — Override Decision Required
+        <div className="bg-amber-500/5 border border-amber-500/25 rounded-2xl p-6 mb-8 shadow-2xl glow-amber animate-pulse-glow">
+          <h3 className="font-bold text-base text-amber-400 mb-2 flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-amber-400 animate-pulse" />
+            Adjuster Review Panel — Action Required
           </h3>
-          <p className="text-xs text-slate-600 mb-4">
-            This claim was automatically flagged for manual review due to low confidence or critical fraud alerts. Enter the final decision and write audit notes.
+          <p className="text-xs text-slate-300 mb-5 leading-relaxed">
+            This claim was automatically flagged due to lower AI extraction confidence or suspicious fraud indicators. Review details below, input final decisions, and log justification overrides.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">Override Decision</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Override Decision</label>
               <select 
                 value={overrideDecision} 
                 onChange={(e: any) => setOverrideDecision(e.target.value)}
-                className="w-full text-sm border border-slate-300 rounded p-2 bg-white"
+                className="w-full text-sm border border-white/10 rounded-xl p-3 bg-slate-950/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
               >
                 <option value="APPROVED">Approve Claim</option>
                 <option value="REJECTED">Reject Claim</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">Approved Amount (₹)</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Approved Amount (₹)</label>
               <input 
                 type="number"
                 value={overrideAmount}
                 onChange={(e) => setOverrideAmount(e.target.value)}
-                className="w-full text-sm border border-slate-300 rounded p-2"
+                className="w-full text-sm border border-white/10 rounded-xl p-3 bg-slate-950/80 text-white placeholder-slate-650 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 placeholder={`Default: ₹${decision.approved_amount}`}
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">Adjuster Employee ID</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Adjuster ID</label>
               <input 
                 type="text"
                 value={adjusterId}
                 onChange={(e) => setAdjusterId(e.target.value)}
-                className="w-full text-sm border border-slate-300 rounded p-2"
+                className="w-full text-sm border border-white/10 rounded-xl p-3 bg-slate-950/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
               />
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Adjuster Justification Notes</label>
+          <div className="mb-5">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Override Justification Notes</label>
             <textarea
               value={adjusterNotes}
               onChange={(e) => setAdjusterNotes(e.target.value)}
-              className="w-full text-sm border border-slate-300 rounded p-2 h-20"
-              placeholder="Provide a reason for overriding this claim decision..."
+              className="w-full text-sm border border-white/10 rounded-xl p-3 bg-slate-950/80 text-white placeholder-slate-600 h-20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              placeholder="Provide clinical rationale or policy exception justifications for overriding this decision..."
             />
           </div>
 
           {overrideSuccess && (
-            <div className="mb-4 p-3 bg-green-100 border border-green-200 text-green-700 text-xs rounded-lg font-medium">
+            <div className="mb-5 p-3.5 bg-green-500/10 border border-green-500/20 text-green-400 text-xs rounded-xl font-semibold shadow-sm">
               {overrideSuccess}
             </div>
           )}
           {overrideError && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 text-xs rounded-lg font-medium">
+            <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl font-semibold shadow-sm">
               {overrideError}
             </div>
           )}
@@ -313,21 +313,21 @@ export default function ClaimResultPage() {
             <button
               onClick={() => handleApplyOverride('APPROVED')}
               disabled={submittingOverride}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-semibold transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
             >
               Approve Claim
             </button>
             <button
               onClick={() => handleApplyOverride('REJECTED')}
               disabled={submittingOverride}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-semibold transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
             >
               Reject Claim
             </button>
             <button
               onClick={() => handleApplyOverride('MANUAL_REVIEW')}
               disabled={submittingOverride}
-              className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-sm font-semibold transition-colors disabled:opacity-50 border border-slate-300"
+              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all disabled:opacity-50 border border-white/5"
             >
               Re-flag Claim
             </button>
@@ -337,29 +337,29 @@ export default function ClaimResultPage() {
 
       {/* Confidence Breakdown Panel */}
       {decision.confidence_breakdown && (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 mb-8 shadow-sm">
-          <h3 className="font-semibold text-base text-slate-800 mb-4 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-blue-600" />
-            Confidence Score Breakdown
+        <div className="glass-card border border-white/5 rounded-2xl p-6 mb-8 shadow-2xl glow-blue">
+          <h3 className="font-bold text-base text-white mb-5 flex items-center gap-2.5">
+            <Activity className="w-5 h-5 text-blue-400" />
+            Adjudication Confidence Analysis
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Extraction Confidence */}
-            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-slate-950/40 border border-white/5 flex flex-col justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                   Extraction Confidence (40%)
                 </div>
-                <div className="text-xs text-slate-500 mb-3">
-                  Measures data parsing completeness and validation success.
+                <div className="text-[11px] text-slate-500 mb-4 leading-relaxed">
+                  Measures multimodal document data parsing integrity & validations.
                 </div>
               </div>
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xl font-bold text-slate-800">{(decision.confidence_breakdown.extraction_confidence * 100).toFixed(0)}%</span>
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className="text-lg font-extrabold text-white">{(decision.confidence_breakdown.extraction_confidence * 100).toFixed(0)}%</span>
                 </div>
-                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-white/5">
                   <div 
-                    className="bg-blue-600 h-full rounded-full transition-all duration-500" 
+                    className="bg-blue-500 h-full rounded-full transition-all duration-500" 
                     style={{ width: `${decision.confidence_breakdown.extraction_confidence * 100}%` }}
                   />
                 </div>
@@ -367,22 +367,22 @@ export default function ClaimResultPage() {
             </div>
 
             {/* Rule Confidence */}
-            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-slate-950/40 border border-white/5 flex flex-col justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                   Rule Confidence (40%)
                 </div>
-                <div className="text-xs text-slate-500 mb-3">
-                  Drops if soft limits are exceeded or pre-auth guidelines are violated.
+                <div className="text-[11px] text-slate-500 mb-4 leading-relaxed">
+                  Reflects alignment with limits, wait periods, and coverage rules.
                 </div>
               </div>
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xl font-bold text-slate-800">{(decision.confidence_breakdown.rule_confidence * 100).toFixed(0)}%</span>
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className="text-lg font-extrabold text-white">{(decision.confidence_breakdown.rule_confidence * 100).toFixed(0)}%</span>
                 </div>
-                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-white/5">
                   <div 
-                    className="bg-blue-600 h-full rounded-full transition-all duration-500" 
+                    className="bg-blue-500 h-full rounded-full transition-all duration-500" 
                     style={{ width: `${decision.confidence_breakdown.rule_confidence * 100}%` }}
                   />
                 </div>
@@ -390,22 +390,22 @@ export default function ClaimResultPage() {
             </div>
 
             {/* Fraud & Doc Quality */}
-            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-slate-950/40 border border-white/5 flex flex-col justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                   Fraud & Doc Quality (20%)
                 </div>
-                <div className="text-xs text-slate-500 mb-3">
-                  Factored down by high fraud scores or missing documents.
+                <div className="text-[11px] text-slate-500 mb-4 leading-relaxed">
+                  Drops in the presence of suspect claims, duplicate scans, or blurred bills.
                 </div>
               </div>
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xl font-bold text-slate-800">{(decision.confidence_breakdown.fraud_doc_quality * 100).toFixed(0)}%</span>
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className="text-lg font-extrabold text-white">{(decision.confidence_breakdown.fraud_doc_quality * 100).toFixed(0)}%</span>
                 </div>
-                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-white/5">
                   <div 
-                    className="bg-blue-600 h-full rounded-full transition-all duration-500" 
+                    className="bg-blue-500 h-full rounded-full transition-all duration-500" 
                     style={{ width: `${decision.confidence_breakdown.fraud_doc_quality * 100}%` }}
                   />
                 </div>
@@ -413,11 +413,11 @@ export default function ClaimResultPage() {
             </div>
           </div>
 
-          <div className="mt-4 p-3 bg-slate-100 rounded-lg border border-slate-200 text-xs text-slate-500 text-center">
-            Weighted Score Formula: <span className="font-semibold text-slate-700">0.40 × Extraction</span> + <span className="font-semibold text-slate-700">0.40 × Rule</span> + <span className="font-semibold text-slate-700">0.20 × Fraud/Doc Quality</span>.
+          <div className="mt-5 p-3.5 bg-slate-950/60 rounded-xl border border-white/5 text-[11px] text-slate-500 text-center leading-relaxed">
+            Weighted Score Formula: <span className="font-semibold text-slate-350">0.40 × Extraction</span> + <span className="font-semibold text-slate-350">0.40 × Rule</span> + <span className="font-semibold text-slate-350">0.20 × Fraud/Doc Quality</span>.
             {decision.fraud_score >= 40 && (
-              <span className="text-red-600 font-semibold block mt-1">
-                ⚠️ Fraud Score ({decision.fraud_score}) is $\ge$ 40. Final confidence is capped at 65%.
+              <span className="text-red-400 font-bold block mt-1.5">
+                ⚠️ Severe Fraud Score ({decision.fraud_score}) detected. Adjudication confidence is capped at 65%.
               </span>
             )}
           </div>
@@ -429,30 +429,35 @@ export default function ClaimResultPage() {
         {/* Left 2 Columns: Tabs and Data */}
         <div className="lg:col-span-2 space-y-6">
           {/* Tab Selector */}
-          <div className="flex border-b border-slate-200">
+          <div className="flex border-b border-white/5 gap-2">
             <button
-              className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors -mb-px ${activeTab === 'timeline' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+              className={`px-5 py-3.5 text-sm font-bold border-b-2 transition-all -mb-px flex items-center gap-2 ${activeTab === 'timeline' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-450 hover:text-slate-200'}`}
               onClick={() => setActiveTab('timeline')}
             >
-              Processing Timeline
+              <Activity className="w-4 h-4" />
+              <span>Processing Timeline</span>
             </button>
             {report && (
               <button
-                className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors -mb-px ${activeTab === 'report' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+                className={`px-5 py-3.5 text-sm font-bold border-b-2 transition-all -mb-px flex items-center gap-2 ${activeTab === 'report' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-450 hover:text-slate-200'}`}
                 onClick={() => setActiveTab('report')}
               >
-                Investigator Report
+                <FileText className="w-4 h-4" />
+                <span>Investigator Report</span>
               </button>
             )}
           </div>
 
           {/* Tab Panes */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm min-h-[400px]">
+          <div className="glass-card border border-white/5 rounded-2xl p-6 shadow-2xl min-h-[420px]">
             {activeTab === 'timeline' && (
               <div>
-                <div className="mb-6 p-4 rounded-lg bg-slate-50 border border-slate-200">
-                  <h3 className="font-bold text-slate-800 text-sm mb-1">Immutable Trace Ledger</h3>
-                  <p className="text-xs text-slate-500">Every agent interaction and deterministic rule check is logged sequentially for 100% auditability.</p>
+                <div className="mb-6 p-4 rounded-xl bg-slate-950/40 border border-white/5 flex items-start gap-2.5">
+                  <BadgeCheck className="w-4.5 h-4.5 text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-bold text-white text-sm">Immutable Trace Ledger</h3>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">Continuous audit log of agent interactions and policy checks executed for this claim.</p>
+                  </div>
                 </div>
                 <TraceLedgerTimeline traces={decision.trace_summary} />
               </div>
@@ -466,31 +471,31 @@ export default function ClaimResultPage() {
 
         {/* Right 1 Column: RAG Policy Assistant Chat */}
         <div className="space-y-6">
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col h-[520px]">
-            <div className="border-b border-slate-200 pb-3 mb-4">
-              <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-600" />
+          <div className="glass-card border border-white/5 rounded-2xl p-5 shadow-2xl flex flex-col h-[540px] glow-blue">
+            <div className="border-b border-white/5 pb-3.5 mb-4">
+              <h3 className="font-bold text-white flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-400" />
                 Ask Policy Assistant
               </h3>
-              <p className="text-xs text-slate-500">Query policy guidelines related to this claim</p>
+              <p className="text-xs text-slate-500 mt-0.5">Query the OPD policy document regarding this claim decision</p>
             </div>
 
             {/* Chat message history */}
-            <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1 text-sm">
+            <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1 text-xs">
               {chatMessages.map((msg, i) => (
                 <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                  <div className={`p-3 rounded-lg max-w-[90%] leading-relaxed ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-800 border border-slate-200'}`}>
+                  <div className={`p-3.5 rounded-xl max-w-[85%] leading-relaxed ${msg.role === 'user' ? 'bg-blue-600 text-white font-semibold' : 'bg-slate-950/70 text-slate-200 border border-white/5 shadow-inner'}`}>
                     {msg.text}
                   </div>
                   
                   {/* Citations */}
                   {msg.sources && msg.sources.length > 0 && (
-                    <div className="mt-1 flex flex-col gap-1 max-w-[90%]">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">References:</span>
+                    <div className="mt-2 flex flex-col gap-1.5 max-w-[85%] w-full">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">References:</span>
                       {msg.sources.map((src, sIdx) => (
-                        <div key={sIdx} className="text-[11px] text-slate-500 bg-slate-50 p-1.5 rounded border border-slate-200 font-mono leading-tight">
-                          <span className="font-bold text-slate-700">{src.source}: </span>
-                          <span>{src.chunk_text.slice(0, 100)}...</span>
+                        <div key={sIdx} className="text-[10px] text-slate-400 bg-slate-950/45 p-2 rounded-lg border border-white/5 font-mono leading-normal shadow-sm">
+                          <span className="font-bold text-blue-400">{src.source}: </span>
+                          <span className="italic">"{src.chunk_text.slice(0, 110)}..."</span>
                         </div>
                       ))}
                     </div>
@@ -499,25 +504,25 @@ export default function ClaimResultPage() {
               ))}
               
               {chatLoading && (
-                <div className="flex items-center gap-2 text-slate-400 italic text-xs">
-                  <Activity className="w-3.5 h-3.5 animate-spin" /> Querying knowledge base...
+                <div className="flex items-center gap-2 text-slate-450 italic text-xs">
+                  <Activity className="w-3.5 h-3.5 animate-spin text-blue-400" /> Vector search on policy terms...
                 </div>
               )}
             </div>
 
             {/* Chat Input form */}
-            <form onSubmit={handleSendChat} className="flex gap-2 pt-2 border-t border-slate-150">
+            <form onSubmit={handleSendChat} className="flex gap-2 pt-3.5 border-t border-white/5">
               <input
                 type="text"
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Ask about waiting periods, rules..."
-                className="flex-1 border border-slate-300 rounded p-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="Ask about dental limits, co-pay..."
+                className="flex-1 border border-white/10 rounded-xl px-3 py-2.5 text-xs bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 disabled={chatLoading}
               />
               <button
                 type="submit"
-                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors flex items-center justify-center disabled:opacity-50"
+                className="p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all flex items-center justify-center disabled:opacity-50"
                 disabled={chatLoading}
               >
                 <Send className="w-4 h-4" />
