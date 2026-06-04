@@ -13,8 +13,8 @@ class DocumentVerificationAgent(BaseAgent):
         doc_details = {}
 
         if file_contents:
-            has_presc = len(file_contents) > 1
-            has_bill = len(file_contents) > 0
+            has_presc = len(file_contents) >= 1
+            has_bill = len(file_contents) >= 1
         else:
             has_presc = pre_extracted_data is not None and (
                 pre_extracted_data.doctor_registration is not None or pre_extracted_data.diagnosis is not None

@@ -8,7 +8,7 @@ import { api } from '../../lib/api';
 export default function Home() {
   const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,20 +33,26 @@ export default function Home() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files) {
+      const newFiles = Array.from(e.dataTransfer.files);
+      setFiles(prev => [...prev, ...newFiles]);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setFiles(prev => [...prev, ...newFiles]);
     }
   };
 
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const onSubmit = async () => {
-    if (!file) {
+    if (files.length === 0) {
       setError("Please upload a claim document first.");
       return;
     }
@@ -54,7 +60,9 @@ export default function Home() {
     setError(null);
     try {
       const formData = new FormData();
-      formData.append('files', file);
+      files.forEach((f) => {
+        formData.append('files', f);
+      });
       formData.append('member_id', memberId);
       formData.append('claim_amount', claimAmount);
       formData.append('treatment_date', treatmentDate);
@@ -193,7 +201,7 @@ export default function Home() {
             <div 
               className={`relative rounded-2xl border-2 border-dashed p-8 transition-all duration-350 text-center flex flex-col items-center justify-center min-h-[220px] group
                 ${dragActive ? 'border-blue-500 bg-blue-500/10' : 'border-white/10 bg-slate-900/30 hover:border-white/20 hover:bg-slate-900/50'}
-                ${file ? 'border-green-500/40 bg-green-500/5 glow-green' : ''}`}
+                ${files.length > 0 ? 'border-green-500/40 bg-green-500/5 glow-green' : ''}`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -201,31 +209,47 @@ export default function Home() {
             >
               <input
                 type="file"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-15"
                 onChange={handleChange}
                 accept=".pdf,.png,.jpg,.jpeg"
                 disabled={isSubmitting}
+                multiple
               />
               
-              <div className="flex flex-col items-center justify-center gap-4">
-                {file ? (
-                  <div className="w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 border border-green-500/20 shadow-lg shadow-green-500/5">
-                    <CheckCircle2 className="w-6 h-6 animate-pulse-glow" />
+              <div className="flex flex-col items-center justify-center gap-4 w-full">
+                {files.length > 0 ? (
+                  <div className="w-full flex flex-col gap-2 max-w-[320px] z-20">
+                    <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 border border-green-500/20 shadow-lg shadow-green-500/5 mx-auto mb-1">
+                      <CheckCircle2 className="w-5 h-5 animate-pulse-glow" />
+                    </div>
+                    {files.map((f, i) => (
+                      <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-white/5 text-xs text-slate-200 w-full hover:border-white/10">
+                        <span className="truncate pr-3 max-w-[200px]">{f.name}</span>
+                        <button 
+                          type="button" 
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeFile(i); }} 
+                          className="text-slate-400 hover:text-white font-bold px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition-colors"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-slate-400 border border-white/10 group-hover:text-blue-400 group-hover:border-blue-500/30 group-hover:bg-blue-500/5 transition-all">
-                    <Upload className="w-6 h-6" />
-                  </div>
+                  <>
+                    <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-slate-400 border border-white/10 group-hover:text-blue-400 group-hover:border-blue-500/30 group-hover:bg-blue-500/5 transition-all">
+                      <Upload className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">
+                        Select or drag documents here
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1.5">
+                        Supports PDF, JPG, PNG (select multiple if needed)
+                      </p>
+                    </div>
+                  </>
                 )}
-                
-                <div>
-                  <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">
-                    {file ? file.name : 'Select or drag document here'}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-1.5">
-                    {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : 'Supports PDF, JPG, PNG up to 10MB'}
-                  </p>
-                </div>
               </div>
             </div>
 
@@ -239,7 +263,7 @@ export default function Home() {
 
           <button
             onClick={onSubmit}
-            disabled={!file || isSubmitting}
+            disabled={files.length === 0 || isSubmitting}
             className="w-full mt-8 py-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2.5 shadow-lg
               disabled:opacity-50 disabled:cursor-not-allowed
               bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/10 hover:shadow-blue-500/20"
