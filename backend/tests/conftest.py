@@ -3,6 +3,12 @@ import pytest
 from pathlib import Path
 from app.models.policy import PolicyTerms
 
+@pytest.fixture(autouse=True)
+def clean_in_memory_claims():
+    """Autouse fixture to clear in-memory claims store before each test to isolate state."""
+    from app.database import IN_MEMORY_CLAIMS
+    IN_MEMORY_CLAIMS.clear()
+
 @pytest.fixture
 def base_policy():
     p = Path(__file__).parent / "reference" / "policy_terms.json"
@@ -21,3 +27,12 @@ def base_policy():
         data["coverage_details"]["diagnostic_tests"]["covered_tests"].append("MRI Lumbar Spine (with pre-auth)")
     
     return PolicyTerms(**data)
+
+
+@pytest.fixture
+def client():
+    """Fixture to provide a test client with FastAPI lifespan started/stopped."""
+    from fastapi.testclient import TestClient
+    from main import app
+    with TestClient(app) as c:
+        yield c

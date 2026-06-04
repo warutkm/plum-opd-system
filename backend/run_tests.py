@@ -262,54 +262,55 @@ test_cases = [
     },
 ]
 
-passed = 0
-failed = 0
-errors = 0
+if __name__ == "__main__":
+    passed = 0
+    failed = 0
+    errors = 0
 
-for tc in test_cases:
-    print(f"\n{'='*60}")
-    print(f"  {tc['id']}: {tc['name']}")
-    print(f"{'='*60}")
-    try:
-        r = requests.post(BASE, json=tc["payload"], timeout=10)
-        if r.status_code != 200:
-            print(f"  HTTP Error: {r.status_code}")
-            print(f"  Response: {r.text[:500]}")
+    for tc in test_cases:
+        print(f"\n{'='*60}")
+        print(f"  {tc['id']}: {tc['name']}")
+        print(f"{'='*60}")
+        try:
+            r = requests.post(BASE, json=tc["payload"], timeout=10)
+            if r.status_code != 200:
+                print(f"  HTTP Error: {r.status_code}")
+                print(f"  Response: {r.text[:500]}")
+                errors += 1
+                continue
+
+            result = r.json()
+            decision = result.get("decision")
+            amount = result.get("approved_amount", 0)
+            confidence = result.get("confidence_score", 0)
+            fraud_score = result.get("fraud_score", 0)
+            rejection = result.get("rejection_reasons", [])
+            notes = result.get("notes", "")
+
+            decision_ok = decision == tc["expected_decision"]
+            amount_ok = tc["expected_amount"] is None or abs(amount - tc["expected_amount"]) < 1
+
+            status_str = "PASS" if (decision_ok and amount_ok) else "FAIL"
+            if status_str == "PASS":
+                passed += 1
+            else:
+                failed += 1
+
+            print(f"  Result: {status_str}")
+            print(f"  Decision:  got={decision}  expected={tc['expected_decision']}  {'OK' if decision_ok else 'MISMATCH'}")
+            if tc["expected_amount"] is not None:
+                print(f"  Amount:    got={amount}  expected={tc['expected_amount']}  {'OK' if amount_ok else 'MISMATCH'}")
+            print(f"  Confidence: {confidence}")
+            print(f"  Fraud Score: {fraud_score}")
+            if rejection:
+                print(f"  Rejection Reasons: {rejection}")
+            if notes:
+                print(f"  Notes: {notes[:200]}")
+
+        except Exception as e:
+            print(f"  ERROR: {e}")
             errors += 1
-            continue
 
-        result = r.json()
-        decision = result.get("decision")
-        amount = result.get("approved_amount", 0)
-        confidence = result.get("confidence_score", 0)
-        fraud_score = result.get("fraud_score", 0)
-        rejection = result.get("rejection_reasons", [])
-        notes = result.get("notes", "")
-
-        decision_ok = decision == tc["expected_decision"]
-        amount_ok = tc["expected_amount"] is None or abs(amount - tc["expected_amount"]) < 1
-
-        status_str = "PASS" if (decision_ok and amount_ok) else "FAIL"
-        if status_str == "PASS":
-            passed += 1
-        else:
-            failed += 1
-
-        print(f"  Result: {status_str}")
-        print(f"  Decision:  got={decision}  expected={tc['expected_decision']}  {'OK' if decision_ok else 'MISMATCH'}")
-        if tc["expected_amount"] is not None:
-            print(f"  Amount:    got={amount}  expected={tc['expected_amount']}  {'OK' if amount_ok else 'MISMATCH'}")
-        print(f"  Confidence: {confidence}")
-        print(f"  Fraud Score: {fraud_score}")
-        if rejection:
-            print(f"  Rejection Reasons: {rejection}")
-        if notes:
-            print(f"  Notes: {notes[:200]}")
-
-    except Exception as e:
-        print(f"  ERROR: {e}")
-        errors += 1
-
-print(f"\n{'='*60}")
-print(f"  SUMMARY: {passed} passed, {failed} failed, {errors} errors out of {len(test_cases)} tests")
-print(f"{'='*60}")
+    print(f"\n{'='*60}")
+    print(f"  SUMMARY: {passed} passed, {failed} failed, {errors} errors out of {len(test_cases)} tests")
+    print(f"{'='*60}")

@@ -1,3 +1,4 @@
+import json
 import pytest
 from datetime import date
 
@@ -25,4 +26,5 @@ def test_api_integration_all_test_cases(client):
         data = response.json()
 
         assert data["decision"] == case["expected_decision"], f"Decision mismatch on {case['id']}: got {data['decision']}, expected {case['expected_decision']}"
-        assert data["approved_amount"] == case["expected_amount"], f"Amount mismatch on {case['id']}: got {data['approved_amount']}, expected {case['expected_amount']}"
+        if case["expected_amount"] is not None:
+            assert data["approved_amount"] == case["expected_amount"], f"Amount mismatch on {case['id']}: got {data['approved_amount']}, expected {case['expected_amount']}"

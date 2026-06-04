@@ -97,24 +97,7 @@ class RuleEngineResult(BaseModel):
     partial_approval: Optional[PartialApprovalResult] = None
     traces: List[AuditTraceEntry] = Field(default_factory=list)
 
-from app.models.report import InvestigatorReport
 
-class ClaimDecisionOutput(BaseModel):
-    claim_id: str
-    decision: str
-    approved_amount: float = 0.0
-    rejection_reasons: List[str] = Field(default_factory=list)
-    rejected_items: List[str] = Field(default_factory=list)
-    confidence_score: float = 0.0
-    fraud_score: float = 0.0
-    notes: str = ""
-    next_steps: str = ""
-    is_cashless_approved: bool = False
-    network_discount: float = 0.0
-    deductions: Dict[str, float] = Field(default_factory=dict)
-    trace_summary: List[AuditTraceEntry] = Field(default_factory=list)
-    investigator_report: Optional[InvestigatorReport] = None
-    confidence_breakdown: Optional['ConfidenceBreakdown'] = None
 
 class MedicalNecessityResult(BaseModel):
     medically_necessary: bool = True

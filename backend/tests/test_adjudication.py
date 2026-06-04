@@ -24,13 +24,7 @@ from app.models.domain import ClaimDecision, ExtractedData
 from app.schemas.decision_schema import MedicalNecessityResult
 
 
-# ── TEST CLIENT FIXTURE WITH LIFESPAN SUPPORT ────────────────────
 
-@pytest.fixture
-def client():
-    """Fixture to provide a test client with FastAPI lifespan started/stopped."""
-    with TestClient(app) as c:
-        yield c
 
 
 # ── MOCK DATA FOR TEST CASES ─────────────────────────────────────

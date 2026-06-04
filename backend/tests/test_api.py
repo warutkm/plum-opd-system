@@ -18,4 +18,6 @@ def test_review_queue_endpoint(client):
     response = client.get("/api/v1/review/queue")
     assert response.status_code == 200
     data = response.json()
-    assert isinstance(data, list)
+    assert isinstance(data, dict)
+    assert "queue" in data
+    assert isinstance(data["queue"], list)

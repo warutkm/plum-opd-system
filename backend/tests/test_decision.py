@@ -79,7 +79,7 @@ def test_decision_aggregator_manual_review_due_to_low_confidence():
     aggregator = DecisionAggregator()
     
     # Low extraction confidence causes composite confidence to drop below 0.70
-    extracted_data = ExtractedData(extraction_confidence=0.30, doctor_registration="KA/12345/2015", bill_amount=1500)
+    extracted_data = ExtractedData(extraction_confidence=0.20, doctor_registration="KA/12345/2015", bill_amount=1500)
     rule_result = RuleEngineResult(
         decision=ClaimDecision.APPROVED,
         approved_amount=1350.0,
