@@ -2,6 +2,11 @@
 
 > **AI-Augmented, Deterministic-Decided** — A production-grade multi-agent pipeline for automated OPD insurance claim adjudication.
 
+### 🌐 Live Deployments
+* **Frontend Application (Vercel)**: [https://plum-opd-system.vercel.app](https://plum-opd-system.vercel.app)
+* **Backend API Gateway (Render)**: [https://plum-opd-system.onrender.com/api/v1](https://plum-opd-system.onrender.com/api/v1)
+* **Interactive API Docs (Render Swagger)**: [https://plum-opd-system.onrender.com/docs](https://plum-opd-system.onrender.com/docs)
+
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js_15-black?logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Supabase](https://img.shields.io/badge/Database-Supabase-3ECF8E?logo=supabase)](https://supabase.com/)
@@ -704,7 +709,9 @@ docker-compose up --build
 | `GET` | `/api/v1/health` | Health check |
 | `WS` | `/ws/{claim_id}` | Real-time processing updates |
 
-### Full OpenAPI spec available at: `http://localhost:8000/docs`
+### Full OpenAPI Specification
+* **Local Development**: `http://localhost:8000/docs`
+* **Live Production Server**: [https://plum-opd-system.onrender.com/docs](https://plum-opd-system.onrender.com/docs)
 
 ---
 
