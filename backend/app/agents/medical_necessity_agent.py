@@ -24,8 +24,8 @@ class MedicalNecessityAgent(BaseAgent):
     Evaluates the relationship between the diagnosis and the treatments.
     """
 
-    def __init__(self, model_name: str = "gemini-2.5-flash-lite") -> None:
-        self.model_name = model_name
+    def __init__(self, model_name: Optional[str] = None) -> None:
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
         api_key = os.getenv("GEMINI_API_KEY")
         if api_key:
             genai.configure(api_key=api_key)

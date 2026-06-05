@@ -9,8 +9,8 @@ from app.rag.retriever import Retriever
 logger = logging.getLogger(__name__)
 
 class Generator:
-    def __init__(self, model_name: str = "gemini-2.5-flash-lite"):
-        self.model_name = model_name
+    def __init__(self, model_name: str = None):
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
         self.embedder = Embedder()
         self.retriever = Retriever()
 

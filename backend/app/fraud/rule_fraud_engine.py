@@ -142,7 +142,7 @@ class RuleFraudEngine:
                     "reasoning": "string explanation of why there is or is not a mismatch"
                 }}
                 """
-                model = genai.GenerativeModel("gemini-2.5-flash-lite")
+                model = genai.GenerativeModel(os.getenv("GEMINI_MODEL", "gemini-1.5-flash"))
                 generation_config = {"response_mime_type": "application/json"}
                 response = model.generate_content(prompt, generation_config=generation_config)
                 result = json.loads(response.text)
