@@ -10,7 +10,7 @@
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js_15-black?logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Supabase](https://img.shields.io/badge/Database-Supabase-3ECF8E?logo=supabase)](https://supabase.com/)
-[![Gemini](https://img.shields.io/badge/AI-Gemini_2.5_Flash-4285F4?logo=google)](https://ai.google.dev/)
+[![Gemini](https://img.shields.io/badge/AI-Gemini_3.1_Flash--Lite-4285F4?logo=google)](https://ai.google.dev/)
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Python](https://img.shields.io/badge/Language-Python_3.12-3776AB?logo=python)](https://python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -44,7 +44,7 @@ The **Plum OPD Claim Adjudication System** is an AI-augmented, deterministic-dec
 ### What It Does
 
 1. **Accepts** medical documents (PDFs, images) via a clean submission UI
-2. **Extracts** structured data using Gemini 2.5 Flash multimodal AI
+2. **Extracts** structured data using Gemini 3.1 Flash-Lite multimodal AI
 3. **Validates** against policy terms using a deterministic rule engine
 4. **Detects fraud** via rule-based and vector-similarity engines
 5. **Generates decisions** with full audit trails and investigator reports
@@ -101,13 +101,13 @@ graph TB
     end
 
     subgraph "🧠 Phase 2 — Extraction"
-        EXTRACT["🔍 Multimodal AI Extraction Agent<br/>(Gemini 2.5 Flash)"]
+        EXTRACT["🔍 Multimodal AI Extraction Agent<br/>(Gemini 3.1 Flash-Lite)"]
         NORM["⚖️ Normalization Agent"]
         VALID["✅ Validation Agent"]
     end
 
     subgraph "🧠 Phase 3 — Medical Review"
-        MED["🏥 Medical Necessity Agent<br/>(Gemini 2.5 Flash)"]
+        MED["🏥 Medical Necessity Agent<br/>(Gemini 3.1 Flash-Lite)"]
     end
 
     subgraph "⚙️ Phase 4 — Deterministic Rule Engine (NO LLM)"
@@ -581,7 +581,7 @@ erDiagram
 | **Styling** | TailwindCSS | Utility-first CSS framework |
 | **UI Components** | shadcn/ui | Accessible, composable components |
 | **Backend** | FastAPI | High-performance Python API |
-| **AI/LLM** | Gemini 2.5 Flash | Multimodal extraction & medical assessment |
+| **AI/LLM** | Gemini 3.1 Flash-Lite | Multimodal extraction & medical assessment |
 | **Database** | PostgreSQL (Supabase) | Primary data store |
 | **Vector Store** | pgvector | Embedding similarity search |
 | **File Storage** | Supabase Storage | Document upload storage |
