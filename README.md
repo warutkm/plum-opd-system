@@ -101,16 +101,16 @@ graph TB
         VALID["✅ Validation Agent"]
     end
 
-    subgraph "⚙️ Phase 3 — Deterministic Rule Engine (NO LLM)"
+    subgraph "🧠 Phase 3 — Medical Review"
+        MED["🏥 Medical Necessity Agent<br/>(Gemini 2.5 Flash)"]
+    end
+
+    subgraph "⚙️ Phase 4 — Deterministic Rule Engine (NO LLM)"
         ELIG["Module A: Eligibility Validation"]
         DOC_VAL["Module B: Documentation Validation"]
         COV["Module C: Coverage Validation"]
         FIN["Module D: Financial Calculator"]
         PARTIAL["Module E: Partial Approval Logic"]
-    end
-
-    subgraph "🧠 Phase 4 — Medical Review"
-        MED["🏥 Medical Necessity Agent<br/>(Gemini 2.5 Flash)"]
     end
 
     subgraph "🛡️ Phase 5 — Fraud Detection"
@@ -149,13 +149,13 @@ graph TB
     DOC_V --> EXTRACT
     EXTRACT --> NORM
     NORM --> VALID
-    VALID --> ELIG
+    VALID --> MED
+    MED --> ELIG
     ELIG --> DOC_VAL
     DOC_VAL --> COV
     COV --> FIN
     FIN --> PARTIAL
-    PARTIAL --> MED
-    MED --> RULE_FRAUD
+    PARTIAL --> RULE_FRAUD
     RULE_FRAUD --> VEC_FRAUD
     VEC_FRAUD --> FRAUD_AGG
     FRAUD_AGG --> DECISION
@@ -256,7 +256,11 @@ sequenceDiagram
     VA->>VA: Cross-validate extracted fields
     VA->>TL: Append { step: "validation", status: "PASS/FAIL" }
 
-    Note over RE: Phase 3 — Deterministic Rule Engine (NO LLM)
+    Note over MN: Phase 3 — Medical Necessity (AI)
+    MN->>MN: Gemini single-call assessment
+    MN->>TL: Append { step: "medical_necessity", status: "PASS/WARNING" }
+
+    Note over RE: Phase 4 — Deterministic Rule Engine (NO LLM)
     RE->>RE: Module A: Eligibility (policy active, waiting period)
     RE->>TL: Append { step: "eligibility_check", status: "PASS/FAIL" }
     RE->>RE: Module B: Documentation (completeness, doctor reg)
@@ -267,10 +271,6 @@ sequenceDiagram
     RE->>TL: Append { step: "financial_check", status: "PASS/FAIL" }
     RE->>RE: Module E: Partial Approval Logic
     RE->>TL: Append { step: "partial_approval_check", status: "PASS/PARTIAL" }
-
-    Note over MN: Phase 4 — Medical Necessity (AI)
-    MN->>MN: Gemini single-call assessment
-    MN->>TL: Append { step: "medical_necessity", status: "PASS/FAIL" }
 
     Note over RF,VF: Phase 5 — Fraud Detection
     RF->>RF: Rule-based checks (frequency, duplicates, age mismatch)
@@ -320,7 +320,10 @@ flowchart TD
 
     NORMALIZE --> VALIDATE{Validation Agent:<br/>Fields cross-validated?}
     VALIDATE -->|❌ Invalid| REJECT_VALID["REJECTED<br/>EXTRACTION_FAILED"]
-    VALIDATE -->|✅ Valid| ELIG_CHECK
+    VALIDATE -->|✅ Valid| MED_CHECK
+
+    MED_CHECK["🧠 Medical Necessity Agent<br/>(Gemini 2.5 Flash)<br/>Advisory assessment"]
+    MED_CHECK --> ELIG_CHECK
 
     ELIG_CHECK{Module A: Eligibility<br/>• Policy active?<br/>• Member covered?<br/>• Waiting period OK?}
     ELIG_CHECK -->|❌ Inactive| REJECT_ELIG["REJECTED<br/>POLICY_INACTIVE"]
@@ -351,12 +354,7 @@ flowchart TD
     PARTIAL_CHECK["Module E: Partial Approval<br/>Split covered vs excluded items"]
     PARTIAL_CHECK --> COPAY_CALC
 
-    COPAY_CALC --> MED_CHECK
-
-    MED_CHECK["🧠 Medical Necessity Agent<br/>(Gemini 2.5 Flash)<br/>Single assessment call"]
-    MED_CHECK --> MED_RESULT{Medically necessary?}
-    MED_RESULT -->|❌ Not necessary| REJECT_MED["REJECTED<br/>NOT_MEDICALLY_NECESSARY"]
-    MED_RESULT -->|✅ Necessary| FRAUD_RULE
+    COPAY_CALC --> FRAUD_RULE
 
     FRAUD_RULE["🔴 Rule-Based Fraud Engine<br/>• 2+ claims in 24h?<br/>• 5+ same provider in 7d?<br/>• Diagnosis-age mismatch?<br/>• Duplicate bill number?"]
     FRAUD_RULE --> FRAUD_VEC
@@ -389,7 +387,7 @@ flowchart TD
     classDef engine fill:#7C4DFF,stroke:#651FFF,color:#fff,stroke-width:2px
 
     class APPROVED,PARTIAL_APPROVED approve
-    class REJECT_UPLOAD,REJECT_DOCS,REJECT_VALID,REJECT_ELIG,REJECT_MEMBER,REJECT_WAIT,REJECT_REG,REJECT_PATIENT,REJECT_COV,REJECT_EXCL,REJECT_AUTH,REJECT_ANN,REJECT_SUB,REJECT_PER,REJECT_MED reject
+    class REJECT_UPLOAD,REJECT_DOCS,REJECT_VALID,REJECT_ELIG,REJECT_MEMBER,REJECT_WAIT,REJECT_REG,REJECT_PATIENT,REJECT_COV,REJECT_EXCL,REJECT_AUTH,REJECT_ANN,REJECT_SUB,REJECT_PER reject
     class MANUAL_REVIEW review
     class EXTRACT,MED_CHECK ai
     class COPAY_CALC,PARTIAL_CHECK engine
@@ -584,7 +582,7 @@ erDiagram
 | **File Storage** | Supabase Storage | Document upload storage |
 | **Auth** | Supabase Auth | Authentication (optional) |
 | **Deployment (FE)** | Vercel | Frontend hosting |
-| **Deployment (BE)** | Railway | Backend API hosting |
+| **Deployment (BE)** | Render | Backend API hosting |
 | **Deployment (DB)** | Supabase | Managed PostgreSQL |
 | **CI/CD** | GitHub Actions | Automated testing & deployment |
 | **Containerization** | Docker / Docker Compose | Local development & deployment |
@@ -676,7 +674,7 @@ docker-compose up --build
 | `SUPABASE_ANON_KEY` | Supabase anonymous key | ✅ |
 | `SUPABASE_SERVICE_KEY` | Supabase service role key | ✅ |
 | `DATABASE_URL` | PostgreSQL connection string | ✅ |
-| `GOOGLE_AI_API_KEY` | Gemini 2.5 Flash API key | ✅ |
+| `GEMINI_API_KEY` | Gemini 2.5 Flash API key | ✅ |
 | `NEXT_PUBLIC_API_URL` | Backend API URL | ✅ |
 | `NEXT_PUBLIC_WS_URL` | WebSocket URL | ✅ |
 | `CORS_ORIGINS` | Allowed CORS origins | ✅ |

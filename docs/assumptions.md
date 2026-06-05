@@ -25,7 +25,7 @@ This document lists the rules, thresholds, and business logic assumptions implem
 - **Consultation Limit**: Consultation fees are capped at **₹1,500 per claim**.
 - **Diagnostic/Laboratory Tests**: Tests are capped at **₹5,000 per claim**.
 - **Co-Pay**: A standard **10% co-pay** is deducted from the approved amount for all claims.
-- **Network Cashless Discount**: If the claim is submitted as cashless at a **Network Hospital** (e.g., *Apollo Hospitals*), a **20% network discount** is deducted from the invoice amount before co-pay calculations.
+- **Network Cashless Discount**: If the claim is submitted as cashless at a **Network Hospital** (e.g., *Apollo Hospitals*), a **20% network discount** is deducted from the invoice amount instead of the standard co-pay.
 - **Pre-Authorization**: High-value diagnostic tests or procedures exceeding **₹10,000** require pre-authorization. If not pre-authorized, the claim is rejected with `PRE_AUTH_MISSING`.
 
 ---

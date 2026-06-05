@@ -52,4 +52,4 @@ This report summarizes the execution outcomes of the **10 Standard Test Cases (T
 9. **TC009 (Obesity Consultation)**:
    - *Reasoning*: Obesity treatment is explicitly excluded in the policy terms. Rejected with `SERVICE_NOT_COVERED`.
 10. **TC010 (Network Hospital Cashless)**:
-    - *Reasoning*: 20% network discount applied to ₹4500 invoice before 10% co-pay (Payout: ₹3600).
+    - *Reasoning*: 20% network discount applied to ₹4500 invoice instead of 10% co-pay (Payout: ₹3600).
