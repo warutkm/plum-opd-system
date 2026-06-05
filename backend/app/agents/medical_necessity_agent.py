@@ -25,7 +25,7 @@ class MedicalNecessityAgent(BaseAgent):
     """
 
     def __init__(self, model_name: Optional[str] = None) -> None:
-        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
         api_key = os.getenv("GEMINI_API_KEY")
         if api_key:
             genai.configure(api_key=api_key)

@@ -680,7 +680,7 @@ docker-compose up --build
 | `SUPABASE_SERVICE_KEY` | Supabase service role key | ✅ |
 | `DATABASE_URL` | PostgreSQL connection string | ✅ |
 | `GEMINI_API_KEY` | Gemini API key (Google AI Studio) | ✅ |
-| `GEMINI_MODEL` | Gemini model name (default: `gemini-1.5-flash`) | ❌ |
+| `GEMINI_MODEL` | Gemini model name (default: `gemini-3.1-flash-lite`) | ❌ |
 | `NEXT_PUBLIC_API_URL` | Backend API URL | ✅ |
 | `NEXT_PUBLIC_WS_URL` | WebSocket URL | ✅ |
 | `CORS_ORIGINS` | Allowed CORS origins | ✅ |

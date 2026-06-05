@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class Generator:
     def __init__(self, model_name: str = None):
-        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
         self.embedder = Embedder()
         self.retriever = Retriever()
 
