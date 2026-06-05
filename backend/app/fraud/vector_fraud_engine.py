@@ -121,11 +121,20 @@ class VectorFraudEngine:
         try:
             with conn:
                 with conn.cursor() as cur:
+                    # Check if the claim exists in the database first.
+                    # This avoids foreign key / not-null constraint errors during detect(),
+                    # since the claim is saved at the end of the transaction by save_claim_to_db.
+                    cur.execute("SELECT id FROM claims WHERE claim_id = %s", (claim_id,))
+                    row = cur.fetchone()
+                    if not row:
+                        return False
+                    
+                    claim_uuid = row[0]
                     cur.execute(
                         """
                         INSERT INTO claim_embeddings (claim_id, embedding, metadata)
                         VALUES (
-                            (SELECT id FROM claims WHERE claim_id = %s),
+                            %s,
                             %s,
                             %s::jsonb
                         )
@@ -133,7 +142,7 @@ class VectorFraudEngine:
                             embedding = EXCLUDED.embedding,
                             metadata = EXCLUDED.metadata
                         """,
-                        (claim_id, embedding, json.dumps(metadata)),
+                        (claim_uuid, embedding, json.dumps(metadata)),
                     )
             return True
         except Exception as exc:
