@@ -73,7 +73,9 @@ class VectorFraudEngine:
             content=text,
             task_type="retrieval_document",
         )
-        return result["embedding"]
+        emb = result["embedding"]
+        # Enforce 768 dimensions to match pgvector schema
+        return emb[:768] if len(emb) > 768 else emb
 
     # ── pgvector Storage & Retrieval ───────────────────────────────────────
 
@@ -214,7 +216,8 @@ class VectorFraudEngine:
             embedding = self._get_embedding(profile_text)
 
             # Step 3: Search for similar claims (DB first, fallback to local)
-            similar_claims = self._search_similar_db(embedding, ctx.claim_id)
+            # Pass None for exclude_claim_id since this claim isn't in DB yet
+            similar_claims = self._search_similar_db(embedding, None)
             if similar_claims is None:
                 similar_claims = self._search_similar_local(
                     embedding, ctx.claim_id

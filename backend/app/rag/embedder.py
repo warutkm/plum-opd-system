@@ -15,4 +15,5 @@ class Embedder:
             content=text,
             task_type="retrieval_query",
         )
-        return result["embedding"]
+        emb = result["embedding"]
+        return emb[:768] if len(emb) > 768 else emb
