@@ -232,13 +232,13 @@ export default function ClaimResultPage() {
         <div className="flex gap-8 bg-slate-950/40 p-4 px-6 rounded-xl border border-white/5 shadow-inner shrink-0 w-full md:w-auto justify-around">
           <div>
             <div className="text-xs font-bold text-slate-400 mb-1">Confidence Score</div>
-            <div className="text-2xl font-extrabold text-white">{(decision.confidence_score * 100).toFixed(0)}%</div>
+            <div className="text-2xl font-extrabold text-white">{((decision.confidence_score ?? 0) * 100).toFixed(0)}%</div>
           </div>
           <div className="border-r border-white/5 my-1.5" />
           <div>
             <div className="text-xs font-bold text-slate-400 mb-1">Fraud Score</div>
-            <div className={`text-2xl font-extrabold ${decision.fraud_score >= 40 ? 'text-red-400' : 'text-white'}`}>
-              {decision.fraud_score.toFixed(0)}/100
+            <div className={`text-2xl font-extrabold ${(decision.fraud_score ?? 0) >= 40 ? 'text-red-400' : 'text-white'}`}>
+              {(decision.fraud_score ?? 0).toFixed(0)}/100
             </div>
           </div>
         </div>
@@ -274,7 +274,7 @@ export default function ClaimResultPage() {
                 value={overrideAmount}
                 onChange={(e) => setOverrideAmount(e.target.value)}
                 className="w-full text-sm border border-white/10 rounded-xl p-3 bg-slate-950/80 text-white placeholder-slate-650 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                placeholder={`Default: ₹${decision.approved_amount}`}
+                placeholder={`Default: ₹${decision.approved_amount ?? 0}`}
               />
             </div>
             <div>
@@ -355,12 +355,12 @@ export default function ClaimResultPage() {
               </div>
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-lg font-extrabold text-white">{(decision.confidence_breakdown.extraction_confidence * 100).toFixed(0)}%</span>
+                  <span className="text-lg font-extrabold text-white">{((decision.confidence_breakdown.extraction_confidence ?? 0) * 100).toFixed(0)}%</span>
                 </div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-white/5">
                   <div 
                     className="bg-blue-500 h-full rounded-full transition-all duration-500" 
-                    style={{ width: `${decision.confidence_breakdown.extraction_confidence * 100}%` }}
+                    style={{ width: `${(decision.confidence_breakdown.extraction_confidence ?? 0) * 100}%` }}
                   />
                 </div>
               </div>
@@ -378,12 +378,12 @@ export default function ClaimResultPage() {
               </div>
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-lg font-extrabold text-white">{(decision.confidence_breakdown.rule_confidence * 100).toFixed(0)}%</span>
+                  <span className="text-lg font-extrabold text-white">{((decision.confidence_breakdown.rule_confidence ?? 0) * 100).toFixed(0)}%</span>
                 </div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-white/5">
                   <div 
                     className="bg-blue-500 h-full rounded-full transition-all duration-500" 
-                    style={{ width: `${decision.confidence_breakdown.rule_confidence * 100}%` }}
+                    style={{ width: `${(decision.confidence_breakdown.rule_confidence ?? 0) * 100}%` }}
                   />
                 </div>
               </div>
@@ -401,12 +401,12 @@ export default function ClaimResultPage() {
               </div>
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-lg font-extrabold text-white">{(decision.confidence_breakdown.fraud_doc_quality * 100).toFixed(0)}%</span>
+                  <span className="text-lg font-extrabold text-white">{((decision.confidence_breakdown.fraud_doc_quality ?? 0) * 100).toFixed(0)}%</span>
                 </div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-white/5">
                   <div 
                     className="bg-blue-500 h-full rounded-full transition-all duration-500" 
-                    style={{ width: `${decision.confidence_breakdown.fraud_doc_quality * 100}%` }}
+                    style={{ width: `${(decision.confidence_breakdown.fraud_doc_quality ?? 0) * 100}%` }}
                   />
                 </div>
               </div>
@@ -415,7 +415,7 @@ export default function ClaimResultPage() {
 
           <div className="mt-5 p-3.5 bg-slate-950/60 rounded-xl border border-white/5 text-[11px] text-slate-500 text-center leading-relaxed">
             Weighted Score Formula: <span className="font-semibold text-slate-350">0.40 × Extraction</span> + <span className="font-semibold text-slate-350">0.40 × Rule</span> + <span className="font-semibold text-slate-350">0.20 × Fraud/Doc Quality</span>.
-            {decision.fraud_score >= 40 && (
+            {(decision.fraud_score ?? 0) >= 40 && (
               <span className="text-red-400 font-bold block mt-1.5">
                 ⚠️ Severe Fraud Score ({decision.fraud_score}) detected. Adjudication confidence is capped at 65%.
               </span>

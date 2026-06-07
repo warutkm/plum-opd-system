@@ -28,8 +28,8 @@ export default function DashboardPage() {
   }, []);
 
   const filteredClaims = claims.filter(c => 
-    c.claim_id.toLowerCase().includes(search.toLowerCase()) ||
-    c.decision.toLowerCase().includes(search.toLowerCase())
+    (c.claim_id || '').toLowerCase().includes(search.toLowerCase()) ||
+    (c.decision || '').toLowerCase().includes(search.toLowerCase())
   );
 
   const stats = {
@@ -143,29 +143,30 @@ export default function DashboardPage() {
                         ${claim.decision === 'APPROVED' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 
                           claim.decision === 'REJECTED' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
                           claim.decision === 'MANUAL_REVIEW' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-sm shadow-amber-500/5' :
-                          'bg-blue-500/10 text-blue-400 border-blue-500/20'}`}>
+                          claim.decision === 'PARTIAL' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                          'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
                         {claim.decision === 'APPROVED' && <CheckCircle2 className="w-3.5 h-3.5 text-green-400 animate-pulse-glow" />}
                         {claim.decision === 'REJECTED' && <XCircle className="w-3.5 h-3.5 text-red-400" />}
                         {claim.decision === 'MANUAL_REVIEW' && <ShieldAlert className="w-3.5 h-3.5 text-amber-400 animate-pulse" />}
                         {claim.decision === 'PARTIAL' && <HelpCircle className="w-3.5 h-3.5 text-blue-400" />}
-                        {claim.decision}
+                        {claim.decision || 'PENDING'}
                       </span>
                     </td>
-                    <td className="px-6 py-4.5 font-bold text-white text-sm">₹{claim.approved_amount?.toLocaleString() || 0}</td>
+                    <td className="px-6 py-4.5 font-bold text-white text-sm">₹{(claim.approved_amount ?? 0).toLocaleString()}</td>
                     <td className="px-6 py-4.5">
                       <div className="flex items-center gap-3">
                         <div className="w-full h-2 bg-slate-950 rounded-full max-w-[90px] border border-white/5 overflow-hidden">
                           <div 
-                            className={`h-full rounded-full transition-all duration-500 ${claim.confidence_score >= 0.8 ? 'bg-green-500 glow-green' : claim.confidence_score >= 0.5 ? 'bg-amber-500' : 'bg-red-500'}`} 
-                            style={{ width: `${claim.confidence_score * 100}%` }} 
+                            className={`h-full rounded-full transition-all duration-500 ${(claim.confidence_score ?? 0) >= 0.8 ? 'bg-green-500 glow-green' : (claim.confidence_score ?? 0) >= 0.5 ? 'bg-amber-500' : 'bg-red-500'}`} 
+                            style={{ width: `${(claim.confidence_score ?? 0) * 100}%` }} 
                           />
                         </div>
-                        <span className="text-xs text-slate-400 font-bold font-mono">{(claim.confidence_score * 100).toFixed(0)}%</span>
+                        <span className="text-xs text-slate-400 font-bold font-mono">{((claim.confidence_score ?? 0) * 100).toFixed(0)}%</span>
                       </div>
                     </td>
                     <td className="px-6 py-4.5">
-                      <span className={`font-mono font-bold text-xs ${claim.fraud_score >= 70 ? 'text-red-400' : claim.fraud_score >= 40 ? 'text-amber-400' : 'text-green-400'}`}>
-                        {claim.fraud_score.toFixed(0)}/100
+                      <span className={`font-mono font-bold text-xs ${(claim.fraud_score ?? 0) >= 70 ? 'text-red-400' : (claim.fraud_score ?? 0) >= 40 ? 'text-amber-400' : 'text-green-400'}`}>
+                        {(claim.fraud_score ?? 0).toFixed(0)}/100
                       </span>
                     </td>
                     <td className="px-6 py-4.5 text-right">
